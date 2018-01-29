@@ -11,3 +11,15 @@ services:
       - ./fdlb_backend:/fdlb_backend
     ports:
       - "7000:7000"
+
+  fdlb_front:
+    container_name: fdlb_front
+    build:
+      context: ./fdlb_front
+      dockerfile: Dockerfile
+    volumes:
+      - './fdlb_front:/usr/src/app'
+    ports:
+      - '9000:9000'
+    environment:
+      - NODE_ENV=development
