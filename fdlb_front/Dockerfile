@@ -14,4 +14,4 @@ RUN npm install --silent
 RUN npm install react-scripts@1.1.0 -g --silent
 
 # start app
-CMD ["HOST='0.0.0.0'","npm", "start"]
+CMD ["npm", "start"]
