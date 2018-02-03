@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Any
 
 
 class BaseTag(ABC):
@@ -16,11 +16,6 @@ class BaseTag(ABC):
 
 
 class BaseSnippet(ABC):
-
-    @property
-    @abstractmethod
-    def name(self) -> str:
-        pass
 
     @property
     @abstractmethod
@@ -41,3 +36,5 @@ class BaseSnippet(ABC):
     @abstractmethod
     def description(self) -> str:
         pass
+
+
