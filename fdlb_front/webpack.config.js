@@ -155,7 +155,7 @@ module.exports = function (env) {
             new webpack.DefinePlugin({
                 'SERVICE_URL': isProduction ?
                     JSON.stringify("http://pro.example.com") :
-                    JSON.stringify("http://dev.example.com"),
+                    JSON.stringify("http://localhost:9000/"),
                 "process.env": {
                     NODE_ENV: isProduction ?
                         JSON.stringify("production") :
@@ -175,17 +175,6 @@ module.exports = function (env) {
             host: '0.0.0.0',
             port: 9000,
             publicPath: '/',
-            // 设置代理，比如，请求 /api/abc 会代理制 http://localhost:7000/abc
-            // https://webpack.js.org/configuration/dev-server/#devserver-proxy
-            // https://github.com/chimurai/http-proxy-middleware#http-proxy-middleware-options
-            proxy: {
-                "/api": {
-                    target: "http://localhost:7000/",
-                    pathRewrite: {"^/api" : ""},
-                    secure: false,
-                    changeOrigin: true
-                }
-            }
         },
         // 为压缩以后的代码提供 source map 方便调试
         // https://webpack.js.org/configuration/devtool/

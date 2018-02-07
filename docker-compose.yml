@@ -6,9 +6,9 @@ services:
     build:
       context: ./fdlb_backend/
       dockerfile: Dockerfile
-    command: "python manage.py runserver 0.0.0.0:7000"
+    command: "python manage.py runserver 0.0.0.0:7000 "
     volumes:
-      - ./fdlb_backend:/fdlb_backend
+      - './fdlb_backend:/fdlb_backend'
     ports:
       - "7000:7000"
 
