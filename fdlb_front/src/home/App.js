@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import { Row, Col, Card } from 'antd';
+import { Card, Col, Row } from 'antd';
 
 import { Link } from 'react-router-dom';
 import './App.css';
 
-const Const = require('./Const');
+const Const = require('../Const');
 const $ = require('jquery');
 
 class App extends Component {
@@ -12,10 +12,6 @@ class App extends Component {
         loading: false,
         snippets: [],
         snippetsList: '',
-    };
-
-    onCardClick = function (content) {
-        console.log(content);
     };
 
     App() {
@@ -31,11 +27,13 @@ class App extends Component {
                         const snippet = snippets[itemPos];
                         col.push(
                             <Col span={columnSpan} key={itemPos}>
-                                <div className="Main-page-card" onClick={() => this.onCardClick(snippet)}>
-                                    <Card title={snippet.name}>
-                                        {snippet.description}
-                                    </Card>
-                                </div>
+                                <Link to={{ pathname: '/snippet', state: { apiUrl: snippet.url } }} >
+                                    <div className="Main-page-card">
+                                        <Card title={snippet.name}>
+                                            {snippet.description}
+                                        </Card>
+                                    </div>
+                                </Link>
                             </Col>,
                         );
                     }
@@ -53,7 +51,6 @@ class App extends Component {
     render() {
         return (
             <div className="App">
-                <Link to="/test"><button>Test</button></Link>
                 {this.state.snippetsList}
             </div>
         );
