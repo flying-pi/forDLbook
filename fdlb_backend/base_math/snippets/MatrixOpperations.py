@@ -1,9 +1,12 @@
 from typing import List
 
+from django.http import JsonResponse
+from django.views import View
+
 from core.BaseComponents import BaseSnippet, BaseTag
 
 
-class MatrixScalarMull(BaseSnippet):
+class MatrixScalarMull(BaseSnippet, View):
     @property
     def content_url(self) -> str:
         return 'example.com'
@@ -19,6 +22,9 @@ class MatrixScalarMull(BaseSnippet):
     @property
     def description(self) -> str:
         return u'Множення матриць на скаляр'
+
+    def get(self, request):
+        return JsonResponse(data={'info': 'ok'})
 
 
 class MatrixByMatrixMull(BaseSnippet):
@@ -37,4 +43,3 @@ class MatrixByMatrixMull(BaseSnippet):
     @property
     def description(self) -> str:
         return u'Множення матриць на матрицю'
-
