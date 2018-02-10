@@ -1,15 +1,24 @@
 from typing import List
 
-from django.http import JsonResponse
-from django.views import View
+from django.urls import reverse
+from django.utils.translation import ugettext_lazy as _
 
-from core.BaseComponents import BaseSnippet, BaseTag
+from core.base_components import BaseSnippet, BaseTag, SimpleLayout
+from core.snippets_view.simple_view import MatrixView, ScalarView
 
 
-class MatrixScalarMull(BaseSnippet, View):
+class MatrixScalarMull(BaseSnippet):
+    @property
+    def layout(self) -> str:
+        return SimpleLayout().add(
+            MatrixView(label=_('Matrix: '),view_id='matrix')
+        ).add(
+            ScalarView(label=_('Scalar: '),view_id='scalar')
+        )
+
     @property
     def content_url(self) -> str:
-        return 'example.com'
+        return reverse('base_math:create_user')
 
     @property
     def tags(self) -> List[BaseTag]:
@@ -23,11 +32,12 @@ class MatrixScalarMull(BaseSnippet, View):
     def description(self) -> str:
         return u'Множення матриць на скаляр'
 
-    def get(self, request):
-        return JsonResponse(data={'info': 'ok'})
-
 
 class MatrixByMatrixMull(BaseSnippet):
+    @property
+    def layout(self) -> str:
+        return SimpleLayout()
+
     @property
     def content_url(self) -> str:
         return 'example.com'

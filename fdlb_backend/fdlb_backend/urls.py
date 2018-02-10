@@ -17,7 +17,9 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.urls import include, path
 
+import base_math
 from core.views import RootView
+import base_math.urls as base_math_urls
 
 
 urlpatterns = [
@@ -26,5 +28,5 @@ urlpatterns = [
 ]
 
 urlpatterns += (
-    url(r'^snippets/base_math/', include('base_math.urls')),
+    url(r'^snippets/base_math/', include(base_math_urls.urlpatterns)),
 )

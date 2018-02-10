@@ -20,6 +20,7 @@ class App extends Component {
                 const snippets = results.snippets;
                 const row = [];
                 const columnSpan = 24 / Const.MAIN_GRID_COUTN;
+                console.log(results);
                 for (let r = 0; r < snippets.length; r += Const.MAIN_GRID_COUTN) {
                     const col = [];
                     for (let c = 0; c < Const.MAIN_GRID_COUTN && r + c < snippets.length; c += 1) {
