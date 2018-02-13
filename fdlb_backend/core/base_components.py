@@ -52,7 +52,7 @@ class SimpleLayout(object):
         return {
             'id': None,
             'className': f'{self_type.__module__}.{self_type.__name__}',
-            'children': [i.serialize() for i in self._items]
+            'childrenView': [i.serialize() for i in self._items]
         }
 
 
