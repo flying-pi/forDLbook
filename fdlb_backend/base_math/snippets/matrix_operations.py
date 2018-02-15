@@ -4,16 +4,20 @@ from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 from core.base_components import BaseSnippet, BaseTag, SimpleLayout
-from core.snippets_view.simple_view import MatrixView, ScalarView
+from core.snippets_view.simple_view import MatrixView, ScalarView, LabelView
 
 
 class MatrixScalarMull(BaseSnippet):
     @property
     def layout(self) -> str:
         return SimpleLayout().add(
-            MatrixView(label=_('Matrix: '),view_id='matrix')
+            LabelView(value=_('Matrix mull by scalar'))
         ).add(
-            ScalarView(label=_('Scalar: '),view_id='scalar')
+            MatrixView(label=_('Matrix: '), view_id='matrix')
+        ).add(
+            LabelView(value=_('mull by:'))
+        ).add(
+            ScalarView(label=_('Scalar: '), view_id='scalar')
         )
 
     @property

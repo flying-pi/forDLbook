@@ -17,9 +17,11 @@ class Snippet extends Component {
             .then((results) => {
                 console.log(results);
                 const ComponentView = ComponentsFactory.getComponentByViewInfo(results.layout.className);
-                const newLayout = ComponentView ? (React.createElement(ComponentView, results.layout)) : 'blank';
-                this.setState({ layout: newLayout });
-                console.log(this.state.layout);
+                const newLayout = ComponentView ? (React.createElement(ComponentView, {
+                    ...results.layout,
+                    key: results.layout.className,
+                })) : 'blank';
+                this.setState({ layout: [newLayout] });
             });
     }
 

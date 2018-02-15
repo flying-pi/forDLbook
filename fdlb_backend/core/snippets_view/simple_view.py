@@ -23,3 +23,9 @@ class MatrixView(BaseView):
     def __setitem__(self, position, val):
         m, n = position
         self.value[m][n] = val
+
+
+class LabelView(BaseView):
+    def __init__(self, **kwargs) -> None:
+        super().__init__(**kwargs)
+        self.value = self.value or ''
