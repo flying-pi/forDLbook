@@ -13,10 +13,8 @@ export default class SimpleLayout extends Component {
         super(props);
         console.log('Simple layout constructor');
         let position = 0;
-        this.state.layout = props.childrenView.map((entry) => {
-            const child = ComponentsFactory.getComponentByViewInfo(entry.className);
-            return child ? React.createElement(child, { ...entry, key: `pos${position += 1}` }) : 'blank';
-        });
+        this.state.layout = props.childrenView.map(entry =>
+            ComponentsFactory.getComponentByViewInfo(entry, `pos${position += 1}`));
     }
 
     render() {
