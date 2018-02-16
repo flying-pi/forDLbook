@@ -1,4 +1,6 @@
 export default class ViewWatcher {
+    viewByIdMap = {};
+
     addMeToComponent = (component) => {
         for (const key in component) { // eslint-disable-line no-restricted-syntax
             if (component.hasOwnProperty(key)) { // eslint-disable-line no-prototype-builtins
@@ -15,6 +17,10 @@ export default class ViewWatcher {
 
     constructor(layoutData) {
         this.addMeToComponent(layoutData);
+    }
+
+    bindViewToID = (view, ID) => {
+        this.viewByIdMap[ID] = view;
     }
 
 }

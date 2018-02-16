@@ -1,21 +1,22 @@
 import React, { Component } from 'react';
 
 
-
-class BaseView extends Component {
+export default class BaseView extends Component {
     state = {
         value: undefined,
     };
+    getViewValue = () => this.state.value;
 
     constructor(props) {
         super(props);
+        if (props.id) {
+            props.wathcer.bindViewToID(this, props.id);
+        }
     }
 
     render() {
         return (
-            <div className="LabelView">
-
-            </div>
+            <div className="LabelView" />
         );
     }
 }

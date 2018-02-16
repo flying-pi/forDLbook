@@ -1,8 +1,9 @@
-import React, { Component } from 'react';
+import React from 'react';
 
 import '../Snippet.css';
+import BaseView from './BaseView';
 
-export default class LabelView extends Component {
+export default class LabelView extends BaseView {
     state = {
         layout: '',
     };

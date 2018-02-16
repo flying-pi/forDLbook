@@ -31,9 +31,6 @@ class Snippet extends Component {
 
     onSubmit() {
         console.log('Snippet submitted');
-        React.Children.forEach(this.props.children, (child) => {
-            console.log(child);
-        });
     }
 
     render() {

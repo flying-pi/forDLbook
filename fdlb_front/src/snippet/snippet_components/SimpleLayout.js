@@ -1,9 +1,10 @@
-import React, { Component } from 'react';
+import React from 'react';
 import '../Snippet.css';
 import ComponentsFactory from './ComponentsFactory';
+import BaseView from './BaseView';
 
 
-export default class SimpleLayout extends Component {
+export default class SimpleLayout extends BaseView {
     state = {
         layout: '',
     };

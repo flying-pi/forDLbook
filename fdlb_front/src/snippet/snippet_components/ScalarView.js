@@ -1,9 +1,10 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { Col, Input, Row } from 'antd';
 
 import '../Snippet.css';
+import BaseView from './BaseView';
 
-export default class ScalarView extends Component {
+export default class ScalarView extends BaseView {
     state = {
         value: 0,
     };

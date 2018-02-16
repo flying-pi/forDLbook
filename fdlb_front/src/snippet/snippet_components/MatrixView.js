@@ -1,10 +1,11 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { Button, Card, Col, Input, Row } from 'antd';
 
 import '../Snippet.css';
 import './MatrixView.css';
+import BaseView from './BaseView';
 
-export default class MatrixView extends Component {
+export default class MatrixView extends BaseView {
 
 
     constructor(props) {
