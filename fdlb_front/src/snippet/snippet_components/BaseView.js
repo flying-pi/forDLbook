@@ -9,7 +9,7 @@ export default class BaseView extends Component {
 
     constructor(props) {
         super(props);
-        if (props.id) {
+        if (props.wathcer && props.id) {
             props.wathcer.bindViewToID(this, props.id);
         }
     }

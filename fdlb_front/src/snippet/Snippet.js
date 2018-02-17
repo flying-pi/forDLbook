@@ -12,6 +12,7 @@ class Snippet extends Component {
     state = {
         apiUrl: this.props.location.state.apiUrl,
         layout: '',
+        responseLayout: '',
     };
 
     Snippet() {
@@ -21,7 +22,7 @@ class Snippet extends Component {
                 this.setState({
                     layout: [ComponentsFactory.getComponentByViewInfo(results.layout, results.layout.className)],
                 });
-                this.setState({ viewStateWatcher });
+                this.setState({ watcher: viewStateWatcher });
             });
     }
 
@@ -30,7 +31,22 @@ class Snippet extends Component {
     }
 
     onSubmit() {
-        console.log('Snippet submitted');
+        $.ajax({
+            url: SERVER_URL + this.state.apiUrl,
+            type: 'post',
+            dataType: 'json',
+            contentType: 'application/json; charset=utf-8',
+            success: (data) => {
+                const responseLayout = data.responseLayout;
+                this.setState({
+                    responseLayout: [ComponentsFactory.getComponentByViewInfo(responseLayout, 'response')],
+                });
+            },
+            error: (error) => {
+                console.log(error);
+            },
+            data: JSON.stringify({ state: this.state.watcher.getViewValues() }),
+        });
     }
 
     render() {
@@ -39,6 +55,10 @@ class Snippet extends Component {
                 {this.state.layout}
                 <Divider />
                 <Button type="primary" onClick={() => this.onSubmit.bind(this)()}>Submit</Button>
+                <Divider />
+                <h2>RESULT ::</h2>
+                <Divider />
+                {this.state.responseLayout}
             </div>
         );
     }

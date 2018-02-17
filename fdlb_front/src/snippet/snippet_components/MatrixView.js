@@ -14,27 +14,26 @@ export default class MatrixView extends BaseView {
             layout: '',
             m: props.value.length,
             n: props.value[0].length,
-            // data: props.value,
-            data: [[11, 12, 13], [21, 22, 23], [31, 32, 33]],
+            value: props.value,
+            // value: [[11, 12, 13], [21, 22, 23], [31, 32, 33]],
         };
-        // this.state.layout = this.updateWith(this.state.data);
-        this.state.layout = this.updateWith([[11, 12, 13], [21, 22, 23], [31, 32, 33]]);
+        this.state.layout = this.updateWith(this.state.value);
     }
 
     onChangeSize() {
         console.log(this.state.m);
         console.log(this.state.n);
-        console.log(this.state.data[0][0]);
+        console.log(this.state.value[0][0]);
         const newMatrix = [];
         for (let i = 0; i < this.state.m; i += 1) {
             const row = [];
             for (let j = 0; j < this.state.m; j += 1) {
-                row.push(i < this.state.data.length && j < this.state.data[0].length ? this.state.data[i][j] : 0);
+                row.push(i < this.state.value.length && j < this.state.value[0].length ? this.state.value[i][j] : 0);
             }
             newMatrix.push(row);
         }
-        this.setState({ data: newMatrix });
-        this.setState({ layout: this.updateWith(this.state.data) });
+        this.setState({ value: newMatrix });
+        this.setState({ layout: this.updateWith(this.state.value) });
     }
 
     updateWith(value) {
@@ -50,9 +49,9 @@ export default class MatrixView extends BaseView {
                     <Input
                         defaultValue={cell}
                         onChange={(e) => {
-                            const newData = this.state.data.slice();
-                            newData[rowNumber][columnNumber] = e.target.value;
-                            this.setState({ data: newData });
+                            const newValue = this.state.value.slice();
+                            newValue[rowNumber][columnNumber] = e.target.value;
+                            this.setState({ value: newValue });
                         }} />
                 </Col>);
             },

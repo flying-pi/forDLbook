@@ -19,6 +19,16 @@ export default class ViewWatcher {
         this.addMeToComponent(layoutData);
     }
 
+    getViewValues = () => {
+        const result = {};
+        for (const key in this.viewByIdMap) { // eslint-disable-line no-restricted-syntax
+            if (this.viewByIdMap.hasOwnProperty(key)) { // eslint-disable-line no-prototype-builtins
+                result[key] = this.viewByIdMap[key].getViewValue();
+            }
+        }
+        return result;
+    };
+
     bindViewToID = (view, ID) => {
         this.viewByIdMap[ID] = view;
     }
