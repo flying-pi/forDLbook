@@ -8,6 +8,7 @@ from core.snippets_view.simple_view import MatrixView, ScalarView, LabelView
 
 
 class MatrixScalarMull(BaseSnippet):
+
     @property
     def layout(self) -> str:
         return SimpleLayout().add(
@@ -35,6 +36,15 @@ class MatrixScalarMull(BaseSnippet):
     @property
     def description(self) -> str:
         return u'Множення матриць на скаляр'
+
+    def process_request(self, data) -> SimpleLayout:
+        scalar = float(data['scalar'])
+        return SimpleLayout().add(MatrixView(
+            label=_('Matrix: '),
+            view_id='matrix',
+            value=[[float(cell) * scalar for cell in row] for row in data['matrix']],
+            editable=False,
+        ))
 
 
 class MatrixByMatrixMull(BaseSnippet):

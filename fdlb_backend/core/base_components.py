@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import List
+import json
 
 from django.http import JsonResponse
 from django.views import View as DjangoView
@@ -9,8 +10,9 @@ class BaseView(object):
 
     def __init__(self, **kwargs) -> None:
         super().__init__()
-        self.__view_id = kwargs.get('view_id', -1)
+        self.__view_id = kwargs.get('view_id', None)
         self.__value = kwargs.get('value', None)
+        self.__editable = kwargs.get('editable', True)
         self.label = kwargs.get('label', '')
 
     @property
@@ -25,6 +27,10 @@ class BaseView(object):
     def value(self, v):
         self.__value = v
 
+    @property
+    def editable(self):
+        return self.__editable
+
     def serialize(self):
         self_type = type(self)
         return {
@@ -32,6 +38,7 @@ class BaseView(object):
             'id': self.__view_id,
             'value': self.__value,
             'label': self.label,
+            'editable': self.__editable,
         }
 
 
@@ -98,3 +105,10 @@ class BaseSnippet(ABC, DjangoView):
 
     def get(self, request):
         return JsonResponse(data={'layout': self.layout.serialize()})
+
+    def process_request(self, data) -> SimpleLayout:
+        return SimpleLayout()
+
+    def post(self, request):
+        state = json.loads(request.body)['state']
+        return JsonResponse(data={'responseLayout': self.process_request(state).serialize()})
