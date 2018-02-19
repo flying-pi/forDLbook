@@ -6,7 +6,7 @@ from typing import List
 
 from django.apps import apps
 
-from core.BaseComponents import BaseSnippet, BaseTag
+from core.base_components import BaseSnippet, BaseTag
 
 
 def get_installed_snippets():
