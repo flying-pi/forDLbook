@@ -25,7 +25,7 @@ export default class MatrixView extends BaseView {
         const newMatrix = [];
         for (let i = 0; i < this.state.m; i += 1) {
             const row = [];
-            for (let j = 0; j < this.state.m; j += 1) {
+            for (let j = 0; j < this.state.n; j += 1) {
                 row.push(i < this.state.value.length && j < this.state.value[0].length ? this.state.value[i][j] : 0);
             }
             newMatrix.push(row);
