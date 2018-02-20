@@ -1,4 +1,6 @@
-export default class ViewWatcher {
+const $ = require('jquery');
+
+export default class ViewBridge {
     viewByIdMap = {};
 
     addMeToComponent = (component) => {
@@ -11,13 +13,31 @@ export default class ViewWatcher {
             }
         }
         if (component.className) {
-            component.wathcer = this; // eslint-disable-line no-param-reassign
+            component.bridge = this; // eslint-disable-line no-param-reassign
         }
     };
 
-    constructor(layoutData) {
-        this.addMeToComponent(layoutData);
-    }
+    sendEvent = (name, callerId) => {
+        const eventBody = {
+            type: name,
+            caller: callerId,
+            data: this.getViewValues(),
+        };
+        $.ajax({
+            url: this.url,
+            type: 'post',
+            dataType: 'json',
+            contentType: 'application/json; charset=utf-8',
+            success: (data) => {
+                console.log(data);
+            },
+            error: (error) => {
+                console.log(error);
+            },
+            data: JSON.stringify(eventBody),
+        });
+        console.log(name + callerId);
+    };
 
     getViewValues = () => {
         const result = {};
@@ -31,6 +51,11 @@ export default class ViewWatcher {
 
     bindViewToID = (view, ID) => {
         this.viewByIdMap[ID] = view;
+    };
+
+    constructor(layoutData, url) {
+        this.addMeToComponent(layoutData);
+        this.url = url;
     }
 
 }

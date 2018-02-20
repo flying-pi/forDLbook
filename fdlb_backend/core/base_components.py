@@ -1,19 +1,24 @@
+import json
 from abc import ABC, abstractmethod
 from typing import List
-import json
 
 from django.http import JsonResponse
 from django.views import View as DjangoView
 
 
 class BaseView(object):
+    SUBMIT_EVENT_NAME = 'on_submit'
+    """
+    use function reference as event listener with next signature of the name: 
+    on_{event_name}
+    """
 
     def __init__(self, **kwargs) -> None:
         super().__init__()
         self.__view_id = kwargs.get('view_id', None)
         self.__value = kwargs.get('value', None)
         self.__editable = kwargs.get('editable', True)
-        self.label = kwargs.get('label', '')
+        self.events = set([])
 
     @property
     def view_id(self):
@@ -31,15 +36,21 @@ class BaseView(object):
     def editable(self):
         return self.__editable
 
+    def add_event(self, name, callback):
+        setattr(self, name, callback)
+        self.events.add(name)
+
     def serialize(self):
         self_type = type(self)
-        return {
+        result = {
             'className': f'{self_type.__module__}.{self_type.__name__}',
             'id': self.__view_id,
             'value': self.__value,
-            'label': self.label,
             'editable': self.__editable,
         }
+        if len(self.events) > 0:
+            result['events'] = list(self.events)
+        return result
 
 
 class SimpleLayout(object):
@@ -61,6 +72,12 @@ class SimpleLayout(object):
             'className': f'{self_type.__module__}.{self_type.__name__}',
             'childrenView': [i.serialize() for i in self._items]
         }
+
+    def get_child_by_id(self, view_id) -> BaseView:
+        for i in self._items:
+            if i.view_id == view_id:
+                return i
+        return None
 
 
 class BaseTag(ABC):
@@ -110,5 +127,23 @@ class BaseSnippet(ABC, DjangoView):
         return SimpleLayout()
 
     def post(self, request):
-        state = json.loads(request.body)['state']
-        return JsonResponse(data={'responseLayout': self.process_request(state).serialize()})
+        json_request = json.loads(request.body)
+        type = json_request.get('type')
+        caller = json_request.get('caller')
+        data = json_request.get('data')
+        if not type or not caller:
+            return JsonResponse(data={'error': 'can not parse request type or type'}, status=400)
+        snippet_layout = self.layout
+        for k, v in data.items():
+            view = snippet_layout.get_child_by_id(k)
+            if view:
+                view.value = v
+                setattr(self, k, view)
+        caller = getattr(self,caller)
+        if not caller:
+            return JsonResponse(data={'error': 'can not found caller object'}, status=400)
+        callback = getattr(caller,type)
+        if not callback:
+            return JsonResponse(data={'error': 'can not found callback for the given event type'}, status=400)
+        callback()
+        return JsonResponse(data=self.layout.serialize())

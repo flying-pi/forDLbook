@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import { Button, Divider } from 'antd';
+import { Divider } from 'antd';
 import './Snippet.css';
 import { SERVER_URL } from '../Const';
 import ComponentsFactory from './snippet_components/ComponentsFactory';
-import ViewWatcher from './snippet_components/ViewWatcher';
+import ViewBridge from './snippet_components/ViewBridge';
 
 
 const $ = require('jquery');
@@ -16,9 +16,10 @@ class Snippet extends Component {
     };
 
     Snippet() {
-        $.getJSON(SERVER_URL + this.state.apiUrl)
+        const url = SERVER_URL + this.state.apiUrl;
+        $.getJSON(url)
             .then((results) => {
-                const viewStateWatcher = new ViewWatcher(results.layout);
+                const viewStateWatcher = new ViewBridge(results.layout, url);
                 this.setState({
                     layout: [ComponentsFactory.getComponentByViewInfo(results.layout, results.layout.className)],
                 });
@@ -54,10 +55,10 @@ class Snippet extends Component {
             <div className="Snippet">
                 {this.state.layout}
                 <Divider />
-                <Button type="primary" onClick={() => this.onSubmit.bind(this)()}>Submit</Button>
-                <Divider />
-                <h2>RESULT ::</h2>
-                <Divider />
+                {/* <Button type="primary" onClick={() => this.onSubmit.bind(this)()}>Submit</Button> */}
+                {/* <Divider /> */}
+                {/* <h2>RESULT ::</h2> */}
+                {/* <Divider /> */}
                 {this.state.responseLayout}
             </div>
         );

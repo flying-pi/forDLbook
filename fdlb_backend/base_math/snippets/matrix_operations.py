@@ -4,21 +4,23 @@ from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 from core.base_components import BaseSnippet, BaseTag, SimpleLayout
-from core.snippets_view.simple_view import MatrixView, ScalarView, LabelView
+from core.snippets_view.simple_view import MatrixView, ScalarView, LabelView, ButtonView
 
 
 class MatrixScalarMull(BaseSnippet):
 
     @property
-    def layout(self) -> str:
+    def layout(self) -> SimpleLayout:
         return SimpleLayout().add(
             LabelView(value=_('Matrix mull by scalar'))
         ).add(
-            MatrixView(label=_('Matrix: '), view_id='matrix')
+            MatrixView(view_id='matrix')
         ).add(
             LabelView(value=_('mull by:'))
         ).add(
-            ScalarView(label=_('Scalar: '), view_id='scalar')
+            ScalarView(view_id='scalar')
+        ).add(
+            ButtonView(view_id='calculate', value=_('Calculate!!'), on_submit=self.on_submit)
         )
 
     @property
@@ -37,6 +39,9 @@ class MatrixScalarMull(BaseSnippet):
     def description(self) -> str:
         return u'Множення матриць на скаляр'
 
+    def on_submit(self):
+        print("submited")
+
     def process_request(self, data) -> SimpleLayout:
         scalar = float(data['scalar'])
         return SimpleLayout().add(MatrixView(
@@ -49,7 +54,7 @@ class MatrixScalarMull(BaseSnippet):
 
 class MatrixByMatrixMull(BaseSnippet):
     @property
-    def layout(self) -> str:
+    def layout(self) -> SimpleLayout:
         return SimpleLayout()
 
     @property

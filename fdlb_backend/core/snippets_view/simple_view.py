@@ -12,9 +12,7 @@ class MatrixView(BaseView):
 
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
-        m = kwargs.get('m', 1)
-        n = kwargs.get('n', 1)
-        self.value = self.value or [[0 for j in range(n)] for i in range(m)]
+        self.value = self.value or [[]]
 
     def __getitem__(self, position):
         m, n = position
@@ -29,3 +27,12 @@ class LabelView(BaseView):
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
         self.value = self.value or ''
+
+
+class ButtonView(BaseView):
+
+    def __init__(self, **kwargs) -> None:
+        super().__init__(**kwargs)
+        on_submit = kwargs.get('on_submit', None)
+        if on_submit:
+            self.add_event('submit', on_submit)
