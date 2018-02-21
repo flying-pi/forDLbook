@@ -7,6 +7,9 @@ class ScalarView(BaseView):
         super().__init__(**kwargs)
         self.value = self.value or 0
 
+    def on_value_set(self, v):
+        return float(v)
+
 
 class MatrixView(BaseView):
 
@@ -21,6 +24,9 @@ class MatrixView(BaseView):
     def __setitem__(self, position, val):
         m, n = position
         self.value[m][n] = val
+
+    def on_value_set(self, v):
+        return [[float(cell) for cell in row] for row in v]
 
 
 class LabelView(BaseView):

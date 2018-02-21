@@ -7,18 +7,11 @@ import BaseView from './BaseView';
 
 export default class MatrixView extends BaseView {
 
-
-    constructor(props) {
-        super(props);
-        this.state = {
-            layout: '',
-            m: props.value.length,
-            n: props.value[0].length,
-            value: props.value,
-            editable: props.editable,
-            // value: [[11, 12, 13], [21, 22, 23], [31, 32, 33]],
-        };
-        this.state.layout = this.updateWith(this.state.value);
+    update(props, stateUpdater) {
+        super.update(props, stateUpdater);
+        stateUpdater({ m: props.value.length });
+        stateUpdater({ n: this.state.m > 0 ? props.value[0].length : 0 });
+        stateUpdater({ layout: this.updateWith(this.state.value) });
     }
 
     onChangeSize() {
@@ -85,7 +78,7 @@ export default class MatrixView extends BaseView {
         return matrixView;
     }
 
-    render() {
+    renderContent() {
         return (
             <div className="MatrixView">
                 <Card>

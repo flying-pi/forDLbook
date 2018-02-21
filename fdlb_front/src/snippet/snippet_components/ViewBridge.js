@@ -28,9 +28,13 @@ export default class ViewBridge {
             type: 'post',
             dataType: 'json',
             contentType: 'application/json; charset=utf-8',
-            success: (data) => {
+            success: ((data) => {
+                const rootView = this.viewByIdMap[data.id];
+                if (rootView) {
+                    rootView.setNewDaya(data);
+                }
                 console.log(data);
-            },
+            }),
             error: (error) => {
                 console.log(error);
             },

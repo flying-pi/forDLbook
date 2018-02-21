@@ -5,20 +5,17 @@ import BaseView from './BaseView';
 
 
 export default class SimpleLayout extends BaseView {
-    state = {
-        layout: '',
-    };
-
-
-    constructor(props) {
-        super(props);
+    update(props, stateUpdater) {
+        super.update(props, stateUpdater);
         console.log('Simple layout constructor');
         let position = 0;
-        this.state.layout = props.childrenView.map(entry =>
-            ComponentsFactory.getComponentByViewInfo(entry, `pos${position += 1}`));
+        stateUpdater({
+            layout: props.childrenView.map(entry =>
+                ComponentsFactory.getComponentByViewInfo(entry, `pos${position += 1}`)),
+        });
     }
 
-    render() {
+    renderContent() {
         return (
             <div className="SimpleLayout">
                 {this.state.layout}

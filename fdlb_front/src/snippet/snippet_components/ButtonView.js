@@ -14,13 +14,7 @@ export default class ButtonView extends BaseView {
         this.sendEvent(this.EVENT_NAME);
     };
 
-    constructor(props) {
-        super(props);
-        this.state.events = props.events;
-        this.state.editable = props.editable;
-    }
-
-    render() {
+    renderContent() {
         return (
             <div className="LabelView">
                 <Button onClick={() => this.onClick.bind(this)()}>{this.state.value}</Button>
