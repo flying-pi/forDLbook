@@ -29,11 +29,12 @@ export default class ViewBridge {
             dataType: 'json',
             contentType: 'application/json; charset=utf-8',
             success: ((data) => {
-                const rootView = this.viewByIdMap[data.id];
+                this.addMeToComponent(data);
+                const params = { ...data, bridge: this };
+                const rootView = this.viewByIdMap[params.id];
                 if (rootView) {
-                    rootView.setNewDaya(data);
+                    rootView.setNewDaya(params);
                 }
-                console.log(data);
             }),
             error: (error) => {
                 console.log(error);

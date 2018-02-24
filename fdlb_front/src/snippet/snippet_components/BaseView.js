@@ -31,6 +31,7 @@ export default class BaseView extends Component {
     }
 
     update(props, stateUpdater) {
+        stateUpdater({ bridge: props.bridge });
         stateUpdater({ value: props.value });
         stateUpdater({ editable: props.editable });
         stateUpdater({ events: props.events || [] });
