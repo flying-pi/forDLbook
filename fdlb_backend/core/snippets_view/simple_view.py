@@ -7,14 +7,15 @@ class ScalarView(BaseView):
         super().__init__(**kwargs)
         self.value = self.value or 0
 
+    def on_value_set(self, v):
+        return float(v)
+
 
 class MatrixView(BaseView):
 
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
-        m = kwargs.get('m', 1)
-        n = kwargs.get('n', 1)
-        self.value = self.value or [[0 for j in range(n)] for i in range(m)]
+        self.value = self.value or [[]]
 
     def __getitem__(self, position):
         m, n = position
@@ -24,8 +25,20 @@ class MatrixView(BaseView):
         m, n = position
         self.value[m][n] = val
 
+    def on_value_set(self, v):
+        return [[float(cell) for cell in row] for row in v]
+
 
 class LabelView(BaseView):
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
         self.value = self.value or ''
+
+
+class ButtonView(BaseView):
+
+    def __init__(self, **kwargs) -> None:
+        super().__init__(**kwargs)
+        on_submit = kwargs.get('on_submit', None)
+        if on_submit:
+            self.add_event('submit', on_submit)

@@ -1,3 +1,4 @@
+/* eslint no-param-reassign: "error" */
 import React, { Component } from 'react';
 
 
@@ -6,17 +7,44 @@ export default class BaseView extends Component {
         value: undefined,
     };
     getViewValue = () => this.state.value;
+    sendEvent = (eventName) => {
+        if (this.state.viewID) {
+            this.state.bridge.sendEvent(eventName, this.state.viewID);
+        }
+    };
 
     constructor(props) {
         super(props);
-        if (props.wathcer && props.id) {
-            props.wathcer.bindViewToID(this, props.id);
+        this.state.bridge = props.bridge;
+        this.update(props, ((newArgs) => {
+            this.state = { ...this.state, ...newArgs };
+        }));
+        if (props.bridge && props.id) {
+            props.bridge.bindViewToID(this, props.id);
         }
     }
 
+    setNewDaya(data) {
+        this.update(data, (newState) => {
+            this.setState(newState);
+        });
+    }
+
+    update(props, stateUpdater) {
+        stateUpdater({ value: props.value });
+        stateUpdater({ editable: props.editable });
+        stateUpdater({ events: props.events || [] });
+        stateUpdater({ visible: props.visible === undefined ? true : props.visible });
+        if (props.id) {
+            stateUpdater({ viewID: props.id });
+        }
+    }
+
+    renderContent() {
+        return (<div />);
+    }
+
     render() {
-        return (
-            <div className="LabelView" />
-        );
+        return this.state.visible ? this.renderContent() : (<div />);
     }
 }
