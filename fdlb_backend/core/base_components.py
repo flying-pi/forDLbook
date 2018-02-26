@@ -21,6 +21,11 @@ class BaseView(object):
         self.__visible = kwargs.get('visible', True)
         self.events = set([])
 
+    def update_view_id(self, new_id):
+        if self.view_id:
+            raise Exception("This view already has id. It cannot be redefined")
+        self.__view_id = new_id
+
     @property
     def view_id(self):
         return self.__view_id
@@ -77,10 +82,10 @@ class SimpleLayout(BaseView):
 
     @property
     def items(self):
-        return self._items
+        return [self, *self._items]
 
     def add(self, view: BaseView):
-        self.items.append(view)
+        self._items.append(view)
         return self
 
     def serialize(self):
@@ -110,6 +115,18 @@ class BaseTag(ABC):
 
 class BaseSnippet(ABC, DjangoView):
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.views_map = {}
+        self.built_layout = self.layout
+        temp_id = 1
+        for i in self.built_layout.items:
+            if not i.view_id:
+                i.update_view_id(f'item{temp_id}')
+                temp_id += 1
+            self.views_map[i.view_id] = i
+            setattr(self, i.view_id, i)
+
     @property
     @abstractmethod
     def content_url(self) -> str:
@@ -136,7 +153,7 @@ class BaseSnippet(ABC, DjangoView):
         pass
 
     def get(self, request):
-        return JsonResponse(data=self.layout.serialize())
+        return JsonResponse(data=self.built_layout.serialize())
 
     def post(self, request):
         json_request = json.loads(request.body)
@@ -145,12 +162,8 @@ class BaseSnippet(ABC, DjangoView):
         data = json_request.get('data')
         if not type or not caller:
             return JsonResponse(data={'error': 'can not parse request type or type'}, status=400)
-        snippet_layout = self.layout
         for k, v in data.items():
-            view = snippet_layout.get_child_by_id(k)
-            if view:
-                view.value = v
-                setattr(self, k, view)
+            self.views_map[k].value = v
         caller = getattr(self, caller)
         if not caller:
             return JsonResponse(data={'error': 'can not found caller object'}, status=400)
@@ -158,4 +171,4 @@ class BaseSnippet(ABC, DjangoView):
         if not callback:
             return JsonResponse(data={'error': 'can not found callback for the given event type'}, status=400)
         callback()
-        return JsonResponse(data=snippet_layout.serialize())
+        return JsonResponse(data=self.built_layout.serialize())
