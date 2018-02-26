@@ -23,3 +23,14 @@ services:
       - '9000:9000'
     environment:
       - NODE_ENV=development
+
+  postgres:
+    container_name: fdlb_postgres
+    image: postgres:10.2
+    env_file: ./envs/local.env
+    volumes:
+      - postgres:/var/lib/postgresql/data/
+    ports:
+      - "5432:5432"
+volumes:
+  postgres:
