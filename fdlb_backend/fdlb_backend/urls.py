@@ -17,10 +17,9 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.urls import include, path
 
-import base_math
-from core.views import RootView
 import base_math.urls as base_math_urls
-
+import supervisor_neural_network.urls as supervisor_neural_network
+from core.views import RootView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,4 +28,5 @@ urlpatterns = [
 
 urlpatterns += (
     url(r'^snippets/base_math/', include(base_math_urls.urlpatterns)),
+    url(r'^snippets/supervisor_neural_network/', include(supervisor_neural_network.urlpatterns)),
 )

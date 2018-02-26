@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'core',
     'base_math',
+    'supervisor_neural_network',
 ]
 
 MIDDLEWARE = [
