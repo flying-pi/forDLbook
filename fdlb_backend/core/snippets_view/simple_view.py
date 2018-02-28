@@ -40,5 +40,33 @@ class ButtonView(BaseView):
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
         on_submit = kwargs.get('on_submit', None)
+        redirect_to = kwargs.get('redirect_to', None)
+        text = kwargs.get('text', None)
+        self.value = self.value or {
+            'redirect_to': redirect_to,
+            'text': text,
+        }
         if on_submit:
             self.add_event('submit', on_submit)
+
+
+class SelectView(BaseView):
+
+    def __init__(self, **kwargs) -> None:
+        super().__init__(**kwargs)
+        placeholder = kwargs.get('placeholder')
+        selected = kwargs.get('selected')
+        options = kwargs.get('options', [])
+        self.value = self.value or {'selected': selected, 'options': options, 'placeholder': placeholder}
+
+    def add_item(self, marker, label):
+        self.value['options'].append({
+            'marker': marker,
+            'label': label
+        })
+
+
+class UploadFile(BaseView):
+    def __init__(self, **kwargs) -> None:
+        super().__init__(**kwargs)
+        self.value = self.value or ''

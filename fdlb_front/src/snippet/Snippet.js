@@ -31,6 +31,12 @@ class Snippet extends Component {
         this.Snippet();
     }
 
+    componentWillReceiveProps(nextProps) {
+        this.setState({ apiUrl: nextProps.location.state.apiUrl });
+        this.Snippet();
+    }
+
+
     render() {
         return (
             <div className="Snippet">
@@ -40,5 +46,5 @@ class Snippet extends Component {
         );
     }
 }
-
+// if(this.state.apiUrl!=this.props.location.state.apiUrl)
 export default Snippet;
