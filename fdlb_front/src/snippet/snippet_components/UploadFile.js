@@ -7,28 +7,23 @@ import BaseView from './BaseView';
 
 export default class UploadFile extends BaseView {
 
-    handleChange = (info) => {
-        if (info.file.status !== 'done') {
-            return;
-        }
-        console.log(info);
+    handleChange = (file) => {
+        console.log(file);
         const reader = new FileReader();
         reader.addEventListener('load', () => {
-            console.log('Info:: ');
-            console.log(reader.result);
-            const base64 = btoa(String.fromCharCode(...new Uint8Array(reader.result)));
-            console.log(base64);
+            this.setState({ value: reader.result });
+            console.log('file uploaded!');
         });
-        reader.readAsArrayBuffer(info.file.originFileObj);
-    }
+        reader.readAsDataURL(file);
+        return false;
+    };
 
     renderContent() {
         return (
             <div className="LabelView">
                 <Upload
                     showUploadList={false}
-                    action="//jsonplaceholder.typicode.com/posts/"
-                    onChange={this.handleChange}>
+                    beforeUpload={this.handleChange}>
                     Upload
                 </Upload>
             </div>

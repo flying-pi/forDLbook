@@ -4,7 +4,7 @@ from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 from core.base_components import BaseSnippet, BaseTag, SimpleLayout
-from core.snippets_view.simple_view import LabelView, ScalarView, UploadFile
+from core.snippets_view.simple_view import LabelView, ScalarView, UploadFile, ButtonView
 
 
 class SimpleNeuralNetworkCreator(BaseSnippet):
@@ -19,6 +19,8 @@ class SimpleNeuralNetworkCreator(BaseSnippet):
                 )
                 .add(ScalarView(view_id='matrix_shape'))
                 .add(UploadFile(view_id='train_data'))
+                .add(ButtonView(view_id='learn', text=_('Learn!!'), on_submit=self.on_learn))
+                .add(LabelView(view_id='learning_accuracy', value=_('accuracy'), visible=False))
         )
 
     @property
@@ -36,3 +38,6 @@ class SimpleNeuralNetworkCreator(BaseSnippet):
     @property
     def description(self) -> str:
         return _(u'Simple Neural Network Creator')
+
+    def on_learn(self):
+        a = 0;
