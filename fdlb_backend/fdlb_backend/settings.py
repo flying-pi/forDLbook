@@ -131,3 +131,5 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 2621440000
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+UPLOADED_FILE_DIR = '/user_content/raw_files/'

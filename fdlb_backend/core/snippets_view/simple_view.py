@@ -8,7 +8,10 @@ class ScalarView(BaseView):
         self.value = self.value or 0
 
     def on_value_set(self, v):
-        return float(v)
+        try:
+            return float(v)
+        except Exception:
+            return v
 
 
 class MatrixView(BaseView):

@@ -19,11 +19,12 @@ from django.urls import include, path
 
 import base_math.urls as base_math_urls
 import supervisor_neural_network.urls as supervisor_neural_network
-from core.views import RootView
+from core.views import RootView, FileView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', RootView.as_view())
+    path('', RootView.as_view()),
+    path('files/', FileView.as_view())
 ]
 
 urlpatterns += (
