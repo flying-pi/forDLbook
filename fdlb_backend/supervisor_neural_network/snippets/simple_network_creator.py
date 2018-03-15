@@ -56,21 +56,28 @@ class SimpleNeuralNetworkCreator(BaseSnippet):
     def cost(self, input: np.ndarray, theta: List[np.ndarray], espect: np.ndarray, lambda_value=0.01):
         a = input
         m = input.shape[0]
-        layer_z = []
+        layer_z = [a]
         layer_a = []
         for t in theta:
-            z = np.insert(a, a.shape[1], 1, axis=1).dot(t)
+            a = np.insert(a, a.shape[1], 1, axis=1)
+            layer_a.append(a)
+            z = a.dot(t)
             layer_z.append(z)
             a = self.sigmoid(z)
-            layer_a.append(a)
-        layer_z = list(reversed(layer_z))
         cost = (sum(espect[i].dot(np.log(a[i].transpose())) + (1 - espect[i]).dot(np.log(1 - a[i].transpose()))
                     for i in range(a.shape[0])) / (-m) +
                 sum(np.sum(t ** 2) for t in theta) * lambda_value / (2 * m))
         delta = [(a-espect)]
         for i in reversed(range(1,len(theta))):
-            delta.append(np.delete(theta[i],-1,axis=0).transpose().dot(delta[-1].transpose())*self.sigmoid_delta(layer_z[i]))
-        return a
+            delta.insert(
+                0,
+                np.delete(theta[i], -1, axis=0).dot(delta[-1].transpose()).transpose() * self.sigmoid_delta(layer_z[i])
+            )
+            # delta[0] = np.delete(delta[0], -1, axis=0)
+        for i in range(len(theta)):
+            theta[i] = theta[i] - (delta[i].transpose().dot(layer_a[i])/m).transpose()
+
+        return cost
 
     def on_learn(self):
         if not self.train_data.value:
@@ -86,5 +93,7 @@ class SimpleNeuralNetworkCreator(BaseSnippet):
         theta = []
         for i in range(1, len(given_layer_shape)):
             theta.append(np.random.rand(given_layer_shape[i - 1] + 1, given_layer_shape[i]))
-        coust = self.cost(data, theta, y)
+        for i in range(50):
+            cost = self.cost(data, theta, y)
+            print("cost: %s",cost)
         a = 0
