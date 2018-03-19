@@ -19,7 +19,7 @@ class SimpleNeuralNetworkCreator(BaseSnippet):
                 .add(LabelView(value=_('Enter network shape in next format :: `number neuron on first layer '
                                        'layer;number neuron on second hiden layer;....;number neuron on output '
                                        'layer`')))
-                .add(ScalarView(view_id='matrix_shape', value='784;40;10'))
+                .add(ScalarView(view_id='matrix_shape', value='784;60;10'))
                 .add(LabelView(value=_('label column name')))
                 .add(ScalarView(view_id='label_column_name', value='label'))
                 .add(UploadFile(view_id='train_data'))
@@ -53,7 +53,14 @@ class SimpleNeuralNetworkCreator(BaseSnippet):
         shortcut = np.eye(int(self.matrix_shape.value.split(';')[-1]))
         return np.array([shortcut[i] for i in scalar_result])
 
-    def cost(self, input: np.ndarray, theta: List[np.ndarray], espect: np.ndarray, lambda_value=0.01):
+    def train(
+            self,
+            input: np.ndarray,
+            espect: np.ndarray,
+            theta: List[np.ndarray],
+            lambda_value=0.1,
+            learning_rate=0.1
+    ):
         a = input
         m = input.shape[0]
         layer_z = [a]
@@ -61,39 +68,76 @@ class SimpleNeuralNetworkCreator(BaseSnippet):
         for t in theta:
             a = np.insert(a, a.shape[1], 1, axis=1)
             layer_a.append(a)
-            z = a.dot(t)
+            z = a.dot(t.T)
             layer_z.append(z)
             a = self.sigmoid(z)
-        cost = (sum(espect[i].dot(np.log(a[i].transpose())) + (1 - espect[i]).dot(np.log(1 - a[i].transpose()))
-                    for i in range(a.shape[0])) / (-m) +
+        cost = (sum((np.log(a[i].transpose()).dot(espect[i])) + (np.log(1 - a[i].transpose()).dot((1 - espect[i])))
+                    for i in range(a.shape[1])) / (-m) +
                 sum(np.sum(t ** 2) for t in theta) * lambda_value / (2 * m))
         delta = [(a-espect)]
         for i in reversed(range(1,len(theta))):
-            delta.insert(
-                0,
-                np.delete(theta[i], -1, axis=0).dot(delta[-1].transpose()).transpose() * self.sigmoid_delta(layer_z[i])
-            )
-            # delta[0] = np.delete(delta[0], -1, axis=0)
+            layer_z[i] = np.insert(layer_z[i], layer_z[i].shape[1], 1, axis=1)
+            d = (delta[0].dot(theta[i]))
+            d = d * self.sigmoid_delta(layer_z[i])
+            d = d[:, 1:]
+            delta.insert(0, d)
         for i in range(len(theta)):
-            theta[i] = theta[i] - (delta[i].transpose().dot(layer_a[i])/m).transpose()
-
+            d = delta[i]
+            grad = d.T.dot(layer_a[i]) / m
+            grad[:,1:] = grad[:,1:] + (1*lambda_value / m * (theta[i][:,1:]))
+            theta[i] = theta[i] - (grad * learning_rate)
+        # https://github.com/nex3z/machine-learning-exercise/blob/master/coursera-machine-learning-python/ex4/nn_cost_function.py
         return cost
+
+    def estimate(self, input, espect, theta):
+        a = input
+        for t in theta:
+            a = np.insert(a, a.shape[1], 1, axis=1)
+            z = a.dot(t.T)
+            a = self.sigmoid(z)
+        result = (a.argmax(axis=1) == espect.argmax(axis=1)).sum() / espect.shape[0]
+        return result
+
+    def read_data(self, file_id: str, group_shape=None):
+        if group_shape is None:
+            group_shape = [0.6, 0.2, 0.2]
+
+        for i in range(1, len(group_shape)):
+            group_shape[i] += group_shape[i - 1]
+
+        filepath = RawUserFile.objects.get(id=int(file_id)).filename
+        data = pd.read_csv(filepath, delimiter=',')
+        data_len = len(data)
+
+        result = []
+        for group in np.split(data, [int(i * data_len) for i in group_shape]):
+            if group.shape[0] == 0:
+                continue
+            output = self.transform_results(group['label'].values)
+            input = group.loc[:, group.columns != self.label_column_name.value].values
+            result.append({'input': input, 'output': output})
+        return result
+
+    def init_theta(self):
+        given_layer_shape = list(map(lambda x: int(x), self.matrix_shape.value.split(';')))
+        return [
+            np.random.rand(given_layer_shape[i], given_layer_shape[i - 1] + 1)*2-1
+            for i in range(1, len(given_layer_shape))
+        ]
 
     def on_learn(self):
         if not self.train_data.value:
             # show some error message
             pass
-        filepath = RawUserFile.objects.get(id=int(self.train_data.value)).filename
-        data = pd.read_csv(filepath, delimiter=',')
-        results = data['label'].values
-        y = self.transform_results(results)
-        data = data.loc[:, data.columns != self.label_column_name.value].values
 
-        given_layer_shape = list(map(lambda x: int(x), self.matrix_shape.value.split(';')))
-        theta = []
-        for i in range(1, len(given_layer_shape)):
-            theta.append(np.random.rand(given_layer_shape[i - 1] + 1, given_layer_shape[i]))
-        for i in range(50):
-            cost = self.cost(data, theta, y)
+        data = self.read_data(self.train_data.value)
+        theta = self.init_theta()
+        train = data[0]
+        test = data[2]
+        for i in range(5000):
+            cost = self.train(train['input'], train['output'], theta)
             print("cost: %s",cost)
+            if i%5 == 0:
+                estimation = self.estimate(test['input'], test['output'], theta)
+                print("estimation: %s", estimation)
         a = 0
