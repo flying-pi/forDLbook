@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'core',
     'base_math',
+    'supervisor_neural_network',
 ]
 
 MIDDLEWARE = [
@@ -123,8 +124,12 @@ USE_L10N = True
 
 USE_TZ = True
 
+DATA_UPLOAD_MAX_MEMORY_SIZE = 2621440000
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+UPLOADED_FILE_DIR = '/user_content/raw_files/'
