@@ -147,10 +147,10 @@ class SimpleNeuralNetworkCreator(BaseSnippet):
         for rate in range(1, 50, 1):
             for lam in range(1, 50, 3):
                 theta = self.init_theta(shape)
-                l = float(lam)/10
-                r = float(rate)/25.0
+                l = float(lam) / 10
+                r = float(rate) / 25.0
                 for i in range(100):
-                    cost = self.train(train['input'], train['output'], theta,lambda_value=l,learning_rate=r)
+                    cost = self.train(train['input'], train['output'], theta, lambda_value=l, learning_rate=r)
                     print("cost: %s", cost)
                     if i % 5 == 0:
                         estimation = self.estimate(test['input'], test['output'], theta)
@@ -163,7 +163,7 @@ class SimpleNeuralNetworkCreator(BaseSnippet):
 
         theta = best_theta
         for i in range(10000):
-            self.train(train['input'], train['output'], theta,lambda_value=best_lambda,learning_rate=best_rate)
+            self.train(train['input'], train['output'], theta, lambda_value=best_lambda, learning_rate=best_rate)
             if i % 5 == 0:
                 estimation = self.estimate(test['input'], test['output'], theta)
                 print("estimation: %s", estimation)
@@ -176,7 +176,14 @@ class SimpleNeuralNetworkCreator(BaseSnippet):
             i += 1
         serialized_shape = shape.tobytes()
         serialized_theta = theta.tobytes()
-        WeightModel.objects.create(name=name, shape=serialized_shape, body=serialized_theta, accuracy=estimation).save()
+        WeightModel.objects.create(
+            name=name,
+            shape=serialized_shape,
+            body=serialized_theta,
+            accuracy=estimation,
+            learn_rate=best_rate,
+            lambda_value=best_lambda,
+        ).save()
         self.learning_accuracy.value = str(estimation)
         self.nn_name.value = name
         a = 0

@@ -9,3 +9,5 @@ class WeightModel(Model):
     shape = BinaryField()
     body = BinaryField()
     accuracy = FloatField(default=-1)
+    lambda_value = FloatField(default=-1)
+    learn_rate = FloatField(default=-1)
