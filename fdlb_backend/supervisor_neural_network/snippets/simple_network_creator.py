@@ -22,7 +22,7 @@ class SimpleNeuralNetworkCreator(BaseSnippet):
                 .add(LabelView(value=_('Enter network shape in next format :: `number neuron on first layer '
                                        'layer;number neuron on second hiden layer;....;number neuron on output '
                                        'layer`')))
-                .add(ScalarView(view_id='matrix_shape', value='784;100;60;10'))
+                .add(ScalarView(view_id='matrix_shape', value='784;200;40;10'))
                 .add(LabelView(value=_('label column name')))
                 .add(ScalarView(view_id='label_column_name', value='label'))
                 .add(UploadFile(view_id='train_data'))
@@ -62,7 +62,7 @@ class SimpleNeuralNetworkCreator(BaseSnippet):
             espect: np.ndarray,
             theta: List[np.ndarray],
             lambda_value=0.1,
-            learning_rate=0.3
+            learning_rate=0.2
     ):
         a = input
         m = input.shape[0]
@@ -140,12 +140,34 @@ class SimpleNeuralNetworkCreator(BaseSnippet):
         train = data[0]
         test = data[2]
         estimation = 0
-        for i in range(6):
-            cost = self.train(train['input'], train['output'], theta)
-            print("cost: %s", cost)
+        best_estimation = 0
+        best_rate = 0
+        best_lambda = 0
+        best_theta = []
+        for rate in range(1, 50, 1):
+            for lam in range(1, 50, 3):
+                theta = self.init_theta(shape)
+                l = float(lam)/10
+                r = float(rate)/25.0
+                for i in range(100):
+                    cost = self.train(train['input'], train['output'], theta,lambda_value=l,learning_rate=r)
+                    print("cost: %s", cost)
+                    if i % 5 == 0:
+                        estimation = self.estimate(test['input'], test['output'], theta)
+                        print("estimation: %s", estimation)
+                if best_estimation < estimation:
+                    best_estimation = estimation
+                    best_rate = r
+                    best_lambda = l
+                    best_theta = theta
+
+        theta = best_theta
+        for i in range(10000):
+            self.train(train['input'], train['output'], theta,lambda_value=best_lambda,learning_rate=best_rate)
             if i % 5 == 0:
                 estimation = self.estimate(test['input'], test['output'], theta)
                 print("estimation: %s", estimation)
+
         original_name = self.nn_name.value
         name = original_name
         i = 1
