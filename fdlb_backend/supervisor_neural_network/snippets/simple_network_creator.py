@@ -162,6 +162,7 @@ class SimpleNeuralNetworkCreator(BaseSnippet):
                     best_theta = theta
 
         theta = best_theta
+        print("STARTING LEARNING!!! rate :: %s, lambda :: %s",best_rate,best_lambda)
         for i in range(10000):
             self.train(train['input'], train['output'], theta, lambda_value=best_lambda, learning_rate=best_rate)
             if i % 5 == 0:
