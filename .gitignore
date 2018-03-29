@@ -4,6 +4,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.pyc
+pip-selfcheck.json
+pyvenv.cfg
+venv/
 
 # C extensions
 *.so
