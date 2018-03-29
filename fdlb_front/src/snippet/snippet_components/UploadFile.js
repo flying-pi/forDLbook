@@ -10,6 +10,7 @@ const Const = require('../../Const');
 
 export default class UploadFile extends BaseView {
 
+    EVENT_NAME = 'upload';
     handleChange = (file) => {
         const data = new FormData();
         data.append('file', file, file.name);
@@ -23,6 +24,9 @@ export default class UploadFile extends BaseView {
             cache: false,
             success: ((response) => {
                 this.setState({ value: response.fileID });
+                if (this.state.events.indexOf(this.EVENT_NAME) >= 0) {
+                    this.sendEvent(this.EVENT_NAME);
+                }
             }),
             error: (error) => {
                 console.log(error);

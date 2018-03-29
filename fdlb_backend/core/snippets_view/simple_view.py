@@ -73,3 +73,12 @@ class UploadFile(BaseView):
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
         self.value = self.value or ''
+        on_upload = kwargs.get('on_upload', None)
+        if on_upload:
+            self.add_event('upload', on_upload)
+
+
+class Image(BaseView):
+    def __init__(self, **kwargs) -> None:
+        super().__init__(**kwargs)
+        self.value = self.value or ''
