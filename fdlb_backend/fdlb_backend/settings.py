@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'core',
     'base_math',
     'supervisor_neural_network',
+    'display',
 ]
 
 MIDDLEWARE = [
@@ -131,5 +132,7 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 2621440000
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 UPLOADED_FILE_DIR = '/user_content/raw_files/'
+IMG_FILE_DIR = '/user_content/img/'

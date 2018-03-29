@@ -144,7 +144,7 @@ class SimpleNeuralNetworkCreator(BaseSnippet):
         best_rate = 0
         best_lambda = 0
         best_theta = []
-        for rate in range(1, 50, 1):
+        for rate in range(18, 50, 1):
             for lam in range(1, 50, 3):
                 theta = self.init_theta(shape)
                 l = float(lam) / 10

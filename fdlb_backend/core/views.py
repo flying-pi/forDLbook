@@ -6,12 +6,14 @@ from pathlib import Path
 from urllib.request import Request
 
 from django.core.files.uploadedfile import InMemoryUploadedFile
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404, HttpResponse
 from django.views import View
 
-from core.models import RawUserFile
+from core.models import RawUserFile, ImageModel
 from core.snippet_utils import get_installed_snippets, snippets_list_serialization
 from fdlb_backend import settings
+
+from PIL.Image import Image
 
 
 class RootView(View):
@@ -62,3 +64,22 @@ class FileView(View):
         return JsonResponse(data={'fileID': file_id})
 
     pass
+
+
+class ImageView(View):
+    def get(self, request, image_name):
+        image_model = ImageModel.objects.filter(name=image_name)
+        if len(image_model) == 0:
+            raise Http404
+        try:
+            with open(image_model[0].image.path, "rb") as f:
+                response =  HttpResponse(f.read(), content_type=image_model[0].mimetype)
+                # response['Content-Disposition'] = f'inline;filename={image_model[0].name}'
+                return response
+        except IOError:
+            raise Http404
+        print('booo')
+        # image = Image(image_model.first())
+        # response = HttpResponse(content_type=image.mimetype)
+        # image.image.save(response, image.mimetype)
+        # return response

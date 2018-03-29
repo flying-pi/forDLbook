@@ -57,6 +57,7 @@ class BaseView(object):
     def add_event(self, name, callback):
         setattr(self, name, callback)
         self.events.add(name)
+        return self
 
     def on_value_set(self, v):
         return v
