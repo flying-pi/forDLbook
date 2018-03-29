@@ -6,7 +6,6 @@ __pycache__/
 *.pyc
 pip-selfcheck.json
 pyvenv.cfg
-venv/
 
 # C extensions
 *.so
