@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     'base_math',
     'supervisor_neural_network',
     'display',
-    'supervisor_neural_network',
 ]
 
 MIDDLEWARE = [
