@@ -3,8 +3,10 @@
     "dependencies": {
         "antd": "^3.1.6",
         "jquery": "^3.3.1",
+        "literallycanvas": "^0.5.0",
         "react": "^15.5.4",
         "react-dom": "^15.5.4",
+        "react-paint": "^1.0.1",
         "react-router": "^4.2.0",
         "react-router-dom": "^4.2.2"
     },

@@ -10,7 +10,8 @@ from core.base_components import BaseSnippet, BaseTag
 
 
 def get_installed_snippets():
-    snippets_items = []
+    snippets_items =[]
+    snippets_classes = set()
     for name, _content in apps.app_configs.items():
         try:
             snippets_pkg_name = f'{name}.snippets'
@@ -27,11 +28,11 @@ def get_installed_snippets():
                     if body.__name__ == BaseSnippet.__name__:
                         continue
                     if issubclass(body, BaseSnippet):
-                        member_instance = body()
-                        snippets_items.append(member_instance)
+                        snippets_classes.add(body)
         except ModuleNotFoundError:
             continue
-    return snippets_items
+
+    return [snippet_class() for snippet_class in snippets_classes]
 
 
 def tags_list_serialization(tags: List[BaseTag]) -> list:

@@ -5,6 +5,9 @@ import SimpleLayout from './SimpleLayout';
 import LabelView from './LabelView';
 import ScalarView from './ScalarView';
 import ButtonView from './ButtonView';
+import SelectView from './SelectView';
+import UploadFile from './UploadFile';
+import Image from './Image';
 
 export default class ComponentsFactory {
     // TODO return some stub in default case
@@ -22,8 +25,17 @@ export default class ComponentsFactory {
             case 'core.snippets_view.simple_view.ScalarView':
                 return React.createFactory(ScalarView);
 
+            case 'core.snippets_view.simple_view.SelectView':
+                return React.createFactory(SelectView);
+
+            case 'core.snippets_view.simple_view.UploadFile':
+                return React.createFactory(UploadFile);
+
             case 'core.base_components.SimpleLayout':
                 return React.createFactory(SimpleLayout);
+
+            case 'core.snippets_view.simple_view.Image':
+                return React.createFactory(Image);
 
             default:
                 return null;

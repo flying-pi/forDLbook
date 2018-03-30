@@ -9,6 +9,7 @@ services:
     command: "python manage.py runserver 0.0.0.0:7000"
     volumes:
       - './fdlb_backend:/backend_fdlb'
+      - 'upload_items:/user_content'
     ports:
       - "7000:7000"
 
@@ -34,3 +35,4 @@ services:
       - "5432:5432"
 volumes:
   postgres:
+  upload_items:
