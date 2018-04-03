@@ -7,6 +7,7 @@ import ScalarView from './ScalarView';
 import ButtonView from './ButtonView';
 import SelectView from './SelectView';
 import UploadFile from './UploadFile';
+import DrawableCanvas from './DrawableCanvas';
 import Image from './Image';
 
 export default class ComponentsFactory {
@@ -33,6 +34,9 @@ export default class ComponentsFactory {
 
             case 'core.base_components.SimpleLayout':
                 return React.createFactory(SimpleLayout);
+
+            case 'supervisor_neural_network.snippets_view.views.DrawableCanvas':
+                return React.createFactory(DrawableCanvas);
 
             case 'core.snippets_view.simple_view.Image':
                 return React.createFactory(Image);

@@ -20,7 +20,7 @@ export default class SelectView extends BaseView {
                 <Select
                     defaultValue={this.state.value.selected || this.state.value.placeholder}
                     onChange={e => this.onChange.bind(this)(e)}>
-                    {this.state.value.options.map((option, pos) => <Option value={pos}>{option}</Option>)}
+                    {this.state.value.options.map((option, pos) => <Option key={`option${pos + 1}`} value={pos}>{option}</Option>)}
                 </Select>
             </div>
         );

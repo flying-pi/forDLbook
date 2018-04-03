@@ -24,6 +24,7 @@ class Snippet extends Component {
                     layout: [ComponentsFactory.getComponentByViewInfo(params, results.className)],
                 });
                 this.setState({ watcher: viewBridge });
+                console.log(results);
             });
     }
 
