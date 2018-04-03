@@ -31,7 +31,7 @@ export default class ButtonView extends BaseView {
             </Button>);
         }
         return (
-            <div className="LabelView">
+            <div className="ButtonView">
                 {button}
             </div>
         );

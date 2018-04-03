@@ -68,6 +68,9 @@ class SelectView(BaseView):
             'label': label
         })
 
+    def selected(self):
+        return self.value['options'][self.value['selected']]
+
 
 class UploadFile(BaseView):
     def __init__(self, **kwargs) -> None:
@@ -82,3 +85,4 @@ class Image(BaseView):
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
         self.value = self.value or ''
+

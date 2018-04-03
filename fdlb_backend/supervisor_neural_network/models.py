@@ -6,7 +6,8 @@ from django.db.models import Model, TextField, BinaryField, FloatField
 
 class WeightModel(Model):
     name = TextField(default='unknown')
-    shape = BinaryField()
+    classificator_provider = TextField(blank=False)
+    shape = BinaryField(blank=True)
     body = BinaryField()
     accuracy = FloatField(default=-1)
     lambda_value = FloatField(default=-1)

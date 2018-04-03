@@ -4,11 +4,13 @@ import numpy as np
 import pandas as pd
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
+from sklearn.neural_network import MLPClassifier
 
 from core.base_components import BaseSnippet, BaseTag, SimpleLayout
 from core.models import RawUserFile
-from core.snippets_view.simple_view import LabelView, ScalarView, UploadFile, ButtonView
+from core.snippets_view.simple_view import LabelView, ScalarView, UploadFile, ButtonView, SelectView
 from supervisor_neural_network.models import WeightModel
+import pickle
 
 
 class SimpleNeuralNetworkCreator(BaseSnippet):
@@ -22,10 +24,15 @@ class SimpleNeuralNetworkCreator(BaseSnippet):
                 .add(LabelView(value=_('Enter network shape in next format :: `number neuron on first layer '
                                        'layer;number neuron on second hiden layer;....;number neuron on output '
                                        'layer`')))
-                .add(ScalarView(view_id='matrix_shape', value='784;200;40;10'))
+                .add(ScalarView(view_id='matrix_shape', value='784;40;40;40;40;10'))
                 .add(LabelView(value=_('label column name')))
                 .add(ScalarView(view_id='label_column_name', value='label'))
                 .add(UploadFile(view_id='train_data'))
+                .add(SelectView(view_id='learn_type',
+                                selected=1,
+                                options=['custom', 'scikit-learn'],
+                                placeholder=_('Select type of the learning')
+                                ))
                 .add(ButtonView(view_id='learn', text=_('Learn!!'), on_submit=self.on_learn))
                 .add(LabelView(view_id='learning_accuracy', value=_('accuracy'), visible=False))
         )
@@ -101,9 +108,9 @@ class SimpleNeuralNetworkCreator(BaseSnippet):
         result = (a.argmax(axis=1) == espect.argmax(axis=1)).sum() / espect.shape[0]
         return result
 
-    def read_data(self, file_id: str, group_shape=None):
+    def read_data(self, file_id: str, group_shape=None,is_vectorize_output = True):
         if group_shape is None:
-            group_shape = [0.6, 0.2, 0.2]
+            group_shape = [0.8, 0.1, 0.1]
 
         for i in range(1, len(group_shape)):
             group_shape[i] += group_shape[i - 1]
@@ -116,7 +123,9 @@ class SimpleNeuralNetworkCreator(BaseSnippet):
         for group in np.split(data, [int(i * data_len) for i in group_shape]):
             if group.shape[0] == 0:
                 continue
-            output = self.transform_results(group['label'].values)
+            output = group['label'].values
+            if is_vectorize_output:
+                output = self.transform_results(output)
             input = group.loc[:, group.columns != self.label_column_name.value].values
             input = input / 255.0 * 2.0 - 1.0
             result.append({'input': input, 'output': output})
@@ -128,11 +137,19 @@ class SimpleNeuralNetworkCreator(BaseSnippet):
     def init_theta(self, shape: np.ndarray):
         return np.array([np.random.rand(shape[i], shape[i - 1] + 1) * 2 - 1 for i in range(1, len(shape))])
 
-    def on_learn(self):
+    def get_model_name(self):
+        original_name = self.nn_name.value
+        name = original_name
+        i = 1
+        while WeightModel.objects.filter(name=name).exists():
+            name = original_name + str(i)
+            i += 1
+        return name
+
+    def custom_learn_process(self):
         if not self.train_data.value:
             # show some error message
             pass
-
         # data = self.read_data(self.train_data.value, group_shape=[0.8, 0.01, 0.2])
         data = self.read_data(self.train_data.value)
         shape = self.get_shape()
@@ -140,51 +157,72 @@ class SimpleNeuralNetworkCreator(BaseSnippet):
         train = data[0]
         test = data[2]
         estimation = 0
-        best_estimation = 0
-        best_rate = 0
-        best_lambda = 0
-        best_theta = []
-        for rate in range(18, 50, 1):
-            for lam in range(1, 50, 3):
-                theta = self.init_theta(shape)
-                l = float(lam) / 10
-                r = float(rate) / 25.0
-                for i in range(100):
-                    cost = self.train(train['input'], train['output'], theta, lambda_value=l, learning_rate=r)
-                    print("cost: %s", cost)
-                    if i % 5 == 0:
-                        estimation = self.estimate(test['input'], test['output'], theta)
-                        print("estimation: %s", estimation)
-                if best_estimation < estimation:
-                    best_estimation = estimation
-                    best_rate = r
-                    best_lambda = l
-                    best_theta = theta
 
-        theta = best_theta
-        print("STARTING LEARNING!!! rate :: %s, lambda :: %s",best_rate,best_lambda)
+        rate_value = 0.001
+        lambda_value = 0.0001
         for i in range(10000):
-            self.train(train['input'], train['output'], theta, lambda_value=best_lambda, learning_rate=best_rate)
+            self.train(train['input'], train['output'], theta, lambda_value=lambda_value, learning_rate=rate_value)
             if i % 5 == 0:
                 estimation = self.estimate(test['input'], test['output'], theta)
                 print("estimation: %s", estimation)
 
-        original_name = self.nn_name.value
-        name = original_name
-        i = 1
-        while WeightModel.objects.filter(name=name).exists():
-            name = original_name + str(i)
-            i += 1
+
+
         serialized_shape = shape.tobytes()
         serialized_theta = theta.tobytes()
+
         WeightModel.objects.create(
-            name=name,
+            name=self.model_name,
+            classificator_provider='custom',
             shape=serialized_shape,
             body=serialized_theta,
             accuracy=estimation,
-            learn_rate=best_rate,
-            lambda_value=best_lambda,
+            learn_rate=rate_value,
+            lambda_value=lambda_value,
         ).save()
-        self.learning_accuracy.value = str(estimation)
-        self.nn_name.value = name
-        a = 0
+        return estimation
+
+    def scikit_learn(self):
+        data = self.read_data(self.train_data.value,is_vectorize_output = False)
+        shape = self.get_shape()[1:-1]
+        lambda_value = 0.01
+        learning_rate = 0.03
+        clf = MLPClassifier(
+            hidden_layer_sizes=tuple(shape),
+            activation='logistic',
+            solver='adam',
+            alpha=lambda_value,
+            learning_rate_init=learning_rate,
+            learning_rate='adaptive',
+            shuffle=True,
+            verbose=True,
+            max_iter = 500,
+        )
+        clf.fit(data[0]['input'],data[0]['output'])
+        score =  clf.score(data[1]['input'],data[1]['output'])
+        print("finish learning .... score :: %s",score)
+
+        WeightModel.objects.create(
+            name=self.model_name,
+            classificator_provider='sklearn',
+            shape= shape.tobytes(),
+            body=pickle.dumps(clf),
+            accuracy=score,
+            learn_rate=learning_rate,
+            lambda_value=lambda_value,
+        ).save()
+        print("boo")
+
+    def on_learn(self):
+        print('on learn button press')
+        self.model_name = self.get_model_name()
+        learn_type = self.learn_type.selected()
+        accuracy  = 0
+        if learn_type == 'custom':
+            accuracy = self.custom_learn_process()
+        else:
+            accuracy = self.scikit_learn()
+
+        self.nn_name.value = self.get_model_name()
+        self.learning_accuracy.value = str(accuracy)
+
